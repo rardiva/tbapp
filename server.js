@@ -11,7 +11,7 @@ app.use(cors());
 
 // Connect to Supabase PostgreSQL
 const pool = new Pool({
-    connectionString: "https://xufshwxbdlznoxpvsalf.supabase.co" // Use Supabase DB URL
+    connectionString: "https://xufshwxbdlznoxpvsalf.supabase.co", // Use Supabase DB URL
     ssl: { rejectUnauthorized: false }
 });
 
