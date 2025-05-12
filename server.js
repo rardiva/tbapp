@@ -15,7 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret"; // Retrieves JWT
 
 // Connect to Supabase PostgreSQL
 const pool = new Pool({
-    connectionString: process.env.SUPABASE_DB_URL, // Connects to PostgreSQL database using environment variables.
+    connectionString: "postgresql://postgres:[YOUR-PASSWORD]@db.xufshwxbdlznoxpvsalf.supabase.co:5432/postgres", // Connects to PostgreSQL database using environment variables.
     ssl: { rejectUnauthorized: false } // Ensures secure connection to the database.
 });
 
