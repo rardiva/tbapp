@@ -1,7 +1,7 @@
-// server.js
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
@@ -10,34 +10,40 @@ app.use(express.json());
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 
-app.post('/api/register', async (req, res) => {
+if (!SUPABASE_URL || !SUPABASE_API_KEY) {
+  console.error("Error: Missing Supabase environment variables.");
+  process.exit(1);
+}
+
+app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password are required.' });
+    return res.status(400).json({ error: "Username and password are required." });
   }
 
   try {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-      method: 'POST',
+    const hashedPassword = await bcrypt.hash(password, 10); // Secure password hashing
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: "POST",
       headers: {
-        'apikey': SUPABASE_API_KEY,
-        'Authorization': `Bearer ${SUPABASE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
+        apikey: SUPABASE_API_KEY,
+        Authorization: `Bearer ${SUPABASE_API_KEY}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email: username, password: hashedPassword }),
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      const errorData = await response.json();
-      return res.status(response.status).json({ error: errorData.message || 'Error inserting user' });
+      return res.status(response.status).json({ error: data.error || "Error inserting user." });
     }
 
-    const user = await response.json();
-    res.status(201).json({ message: 'User registered', user });
+    res.status(201).json({ message: "User registered", user: data });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Registration error:", err);
+    res.status(500).json({ error: "Registration failed. Please try again later." });
   }
 });
 
