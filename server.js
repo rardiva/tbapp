@@ -15,7 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret"; // Retrieves JWT
 
 // Connect to Supabase PostgreSQL
 const pool = new Pool({
-    connectionString: "postgresql://postgres:[YOUR-PASSWORD]@db.xufshwxbdlznoxpvsalf.supabase.co:5432/postgres", // Connects to PostgreSQL database using environment variables.
+    connectionString: process.env.SUPABASE_DB_URL, // Retrieves DB connection string securely from environment variables.
     ssl: { rejectUnauthorized: false } // Ensures secure connection to the database.
 });
 
@@ -24,7 +24,7 @@ app.post("/register", async (req, res) => { // Defines an API route to register 
     const { email, password } = req.body; // Extracts email and password from the request body.
 
     try {
-        const hashedPassword = await bcrypt.hash(password, 10); // Hashes the password before storing it in the database.
+        const hashedPassword = await bcrypt.hash(password, 10); // Asynchronously hashes the password before storing it in the database.
 
         const result = await pool.query(
             "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *", // Inserts the new user into the database and returns the inserted row.
@@ -33,8 +33,8 @@ app.post("/register", async (req, res) => { // Defines an API route to register 
 
         res.status(201).json({ user: result.rows[0] }); // Sends a success response with the registered user details.
     } catch (error) {
-        console.error(error); // Logs the error to the console for debugging.
-        res.status(500).json({ error: error.message }); // Sends an error response if registration fails.
+        console.error("Registration error:", error); // Logs the error to the console for debugging.
+        res.status(500).json({ error: "Registration failed. Please try again." }); // Sends a generic error response.
     }
 });
 
@@ -48,22 +48,22 @@ app.post("/login", async (req, res) => { // Defines an API route to handle user 
         if (result.rows.length > 0) { // Checks if the user exists in the database.
             const user = result.rows[0]; // Gets the user details.
 
-            if (await bcrypt.compare(password, user.password)) { // Verifies the hashed password.
+            if (await bcrypt.compare(password, user.password)) { // Verifies the hashed password asynchronously.
                 const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" }); // Generates a JWT token for authentication.
 
                 res.json({ message: "Login successful", token }); // Sends a success response with the JWT token.
             } else {
-                res.status(401).json({ error: "Invalid credentials" }); // Sends an error response if the password is incorrect.
+                res.status(401).json({ error: "Invalid credentials. Please check your email or password." }); // Sends an error response if the password is incorrect.
             }
         } else {
-            res.status(404).json({ error: "User not found" }); // Sends an error response if the email is not found.
+            res.status(404).json({ error: "User not found. Please register first." }); // Sends an error response if the email is not found.
         }
     } catch (error) {
-        console.error(error); // Logs the error for debugging.
-        res.status(500).json({ error: error.message }); // Sends an error response if login fails.
+        console.error("Login error:", error); // Logs the error for debugging.
+        res.status(500).json({ error: "Login failed. Please try again later." }); // Sends a generic error response.
     }
 });
 
 // Start Express Server
 const PORT = process.env.PORT || 3000; // Retrieves the port from environment variables or defaults to 3000.
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`)); // Starts the Express server and logs the running port.
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`)); // Starts the Express server and logs the running port.
