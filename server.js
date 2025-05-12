@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
