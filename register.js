@@ -1,20 +1,20 @@
 const express = require('express');
 const { Pool } = require('pg');
-const app = express();
+const cors = require('cors');
+require('dotenv').config();
 
-app.use(express.urlencoded({ extended: true }));
+const app = express();
+app.use(express.json());
+app.use(cors());
 
 const pool = new Pool({
-  user: 'your_db_user',
-  host: 'your_db_host',
-  database: 'your_db_name',
-  password: 'your_db_password',
-  port: 'your_db_port'
+  connectionString: process.env.postgresql://postgres:[YOUR-PASSWORD]@db.xufshwxbdlznoxpvsalf.supabase.co:5432/postgres, // Get this from Supabase dashboard
+  ssl: { rejectUnauthorized: false }
 });
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password]);
     res.json({ message: 'User registered successfully!' });
@@ -23,6 +23,4 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+app.listen(3000, () => console.log('Server running on port 3000'));
