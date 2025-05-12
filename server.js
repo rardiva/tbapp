@@ -10,7 +10,7 @@ app.use(express.json());
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_API_KEY = process.env.SUPABASE_API_KEY;
 
-app.post('/api/register', async (req, res) => {
+app.post('https://tbapp-j8co873jo-gerard-ivalaoas-projects.vercel.app', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
