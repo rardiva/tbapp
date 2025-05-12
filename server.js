@@ -9,16 +9,19 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Secure Environment Variables
+const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
+
 // Connect to Supabase PostgreSQL
 const pool = new Pool({
-    connectionString: "https://xufshwxbdlznoxpvsalf.supabase.co", // Use Supabase DB URL
+    connectionString: process.env.SUPABASE_DB_URL = postgresql://postgres:[YOUR-PASSWORD]@db.xufshwxbdlznoxpvsalf.supabase.co:5432/postgres
     ssl: { rejectUnauthorized: false }
 });
 
 // User Registration Endpoint
 app.post("/register", async (req, res) => {
     const { email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = bcrypt.hashSync(password, 10);
 
     try {
         const result = await pool.query(
@@ -41,8 +44,8 @@ app.post("/login", async (req, res) => {
         if (result.rows.length > 0) {
             const user = result.rows[0];
 
-            if (await bcrypt.compare(password, user.password)) {
-                const token = jwt.sign({ id: user.id, email: user.email }, "SECRET", { expiresIn: "1h" });
+            if (bcrypt.compareSync(password, user.password)) {
+                const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
                 res.json({ message: "Login successful", token });
             } else {
                 res.status(401).json({ error: "Invalid credentials" });
@@ -56,4 +59,5 @@ app.post("/login", async (req, res) => {
 });
 
 // Start Express Server
-app.listen(3000, () => console.log("Server running on port 3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
