@@ -15,7 +15,7 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
   process.exit(1);
 }
 
-app.post("/api/register", async (req, res) => {
+app.post("/api/server", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
