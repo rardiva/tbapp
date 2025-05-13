@@ -25,7 +25,7 @@ app.post("/api/register", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10); // Secure password hashing
 
-    const response = await fetch(`${SUPABASE_URL}/tab/users`, {
+    const response = await fetch(`${SUPABASE_URL}/editor/users`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_API_KEY,
