@@ -15,7 +15,7 @@ if (!SUPABASE_URL || !SUPABASE_API_KEY) {
   process.exit(1);
 }
 
-app.post("/api/server", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -25,7 +25,7 @@ app.post("/api/server", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10); // Secure password hashing
 
-    const response = await fetch(`${SUPABASE_URL}/editor/users`, {
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/callback`, {
       method: "POST",
       headers: {
         apikey: SUPABASE_API_KEY,
